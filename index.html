@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO LIST</title>
+    
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+    
+    
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        *:focus {
+    outline: none;
+}
+
+        .main-section{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            height: 80vh;
+            /* border: 1px solid black; */
+            width: 30%;
+            margin:  50px auto;
+        }
+        .main-container{
+            text-align: center;
+            width: 100%;
+        }
+        .todo-header h1{
+            margin: 20px;
+            color: white;
+        }
+        .add-task{
+            padding: 10px;
+
+        }
+        .todo-header, .add-task{
+            border: 1px solid black;
+            background-color: #14213D;
+
+        }
+        .add-task{
+            border-right: 1px solid black;
+            border-left: 1px solid black;
+            border-top: 0;
+            border-bottom: 0;
+        }
+        .task-input{
+            display: flex;
+        }
+        .task-input input[type=text]{
+            width: 100%;
+            padding: 10px;
+        }
+        .task-input input[type=text] :focus{
+            all: unset;
+        }
+        .task-input input[type=button]{
+            width: fit-content;
+            padding: 10px 16px;
+            background-color: green;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+        .task-content{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #14213D;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+        .task-container{
+            padding: 10px;
+            height: 60vh;
+            border: 1px solid  #14213D;
+            overflow: scroll;
+            background-color: #E5E5E5;
+        }
+        .fa-trash{
+            cursor: pointer;
+        }
+      
+    </style>
+</head>
+<body>
+    <section class="main-section">
+        <div class="main-container">
+            <div class="todo-header">
+                <h1>TODO LIST</h1>
+            </div>
+            <div class="add-task">
+                <div class="task-input">
+                    <input type="text" name="input-box" id="input-box" placeholder="Enter your task">
+                    <input type="button" onclick="addTask()" name="add-btn" id="add-btn" value="ADD">
+                </div>
+            </div>
+            <div class="todo-body">
+                <div class="task-container">
+                    <!-- <div class="task-content">
+                        <p>Drink water</p>
+                        <p><i class="fa fa-trash" aria-hidden="true"></i></p>
+                    </div> -->
+                 
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+        const taskContainer = document.querySelector(".task-container")
+
+        var getTasks = localStorage.getItem("tasks");
+        var getTasksList = JSON.parse(getTasks);
+
+        window.onload = () =>{
+
+           
+            var tasks =``;
+            if(getTasksList!=null){
+                getTasksList.forEach(task => {
+               tasks += ` <div class="task-content">
+                        <p>${task.value}</p>
+                        <p><i  id = "${task.id}" class="fa fa-trash" aria-hidden="true"></i></p>
+                    </div>`;
+            }); 
+            taskContainer.innerHTML = tasks;
+            deleteTask();
+            }
+           
+          
+        }
+        function addTask(){
+        var getTasks = localStorage.getItem("tasks");
+        var getTasksList = JSON.parse(getTasks);
+        if(getTasksList==null){
+            getTasksList = [];
+        }
+        const taskValue = document.getElementById("input-box").value;
+        const seconds = Math.floor(Date.now() / 1000);
+        if(taskValue!=""){
+        const obj = {
+            id : seconds,
+            value : taskValue
+        }
+
+
+        getTasksList.push(obj);
+        updateLocalStorage(getTasksList);
+        console.log(getTasksList);
+        console.log(taskValue);
+        const divCont = document.createElement("div");
+        divCont.className = "task-content";
+        let tasks1 = `
+                        <p>${taskValue}</p>
+                        <p><i id = "${seconds}" class="fa fa-trash" aria-hidden="true"></i></p>`;
+        divCont.innerHTML = tasks1;
+        taskContainer.append(divCont)
+        document.getElementById("input-box").value = "";
+        deleteTask();
+    }
+else{
+    alert("Task Field can not be empty")
+}
+            
+        }
+
+        function deleteTask(){
+            const deleteBtn = document.querySelectorAll('.fa-trash');
+            deleteBtn.forEach(del =>{
+                del.addEventListener("click",function(){
+                var getTasks = localStorage.getItem("tasks");
+                var getTasksList = JSON.parse(getTasks);
+
+                var parent = del.parentNode.parentNode.parentNode;
+                var deleteElement = del.parentNode.parentNode;
+                var listDelete = del.id;
+                console.log(listDelete);
+
+                myArray = getTasksList.filter(function( obj ) {
+                    return obj.id != listDelete;
+                });
+                console.log(myArray)
+                updateLocalStorage(myArray);
+                parent.removeChild(deleteElement);
+            })
+
+            })
+        }
+        function updateLocalStorage(list){
+            var jsonList = JSON.stringify(list);
+            localStorage.setItem("tasks",jsonList);
+        }
+    </script>
+</body>
+</html>
